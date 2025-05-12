@@ -1,0 +1,55 @@
+# Node modules cho tất cả service
+**/node_modules/
+node_modules/
+
+# File môi trường (env secrets)
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Log files
+logs
+*.log
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Tập tin hệ thống tạm
+.DS_Store
+Thumbs.db
+
+# Build / dist / tmp
+dist/
+build/
+tmp/
+temp/
+coverage/
+.cache/
+
+# VSCode & IDEs
+.vscode/
+.idea/
+
+# Docker & PID files
+*.pid
+pids/
+docker-compose.override.yml
+
+# Jest / Testing
+coverage/
+*.lcov
+
+# Prisma (nếu dùng)
+prisma/migrations/
+*.sqlite
+
+# Mongo dump (nếu có)
+dump/
+
+# Lint cache
+.eslintcache
+
+# Yarn / NPM lock file (tùy theo chiến lược team)
+# yarn.lock
+# package-lock.json

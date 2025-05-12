@@ -1,0 +1,34 @@
+{
+  "name": "cs-be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "run-p auth chat gateway",
+    "auth": "cd services/auth-service && npm run dev",
+    "chat": "cd services/chat-service && npm run dev",
+    "gateway": "cd gateway && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/connect-sport/cs-be.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/connect-sport/cs-be/issues"
+  },
+  "homepage": "https://github.com/connect-sport/cs-be#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}

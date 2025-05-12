@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./services/auth-service/.env
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    networks:
+      - backend
+
+  chat-service:
+    build: ./services/chat-service
+    container_name: chat-service
+    ports:
+      - "5002:5002"
+    env_file:
+      - ./services/chat-service/.env
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    networks:
+      - backend
+
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./gateway/.env
+    restart: unless-stopped
+    depends_on:
+      - auth-service
+      - chat-service
+    networks:
+      - backend
+
+  mongo:
+    image: mongo:latest # Sử dụng image MongoDB chính thức
+    volumes:
+      - "E:/data/db:/data/db" # Cập nhật đường dẫn tuyệt đối cho volume
+    ports:
+      - "27017:27017" # Ánh xạ cổng MongoDB từ container ra host
+
+volumes:
+  mongo-data:
+
+networks:
+  backend:
+    driver: bridge
