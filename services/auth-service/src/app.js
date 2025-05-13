@@ -1,9 +1,14 @@
+require("module-alias/register");
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
 dotenv.config();
+
+require("dotenv").config({
+  path: process.env.NODE_ENV === "docker" ? ".env.docker" : ".env.local",
+});
 
 const app = express();
 app.use(cors());
@@ -20,7 +25,7 @@ mongoose
 
 // Routes
 const authRoutes = require("./routes/auth.route");
-app.use("/api/auth", authRoutes);
+app.use("/api/connect-sport/auth", authRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`🔐 Auth service running on port ${process.env.PORT}`);

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*"],
+      "@utils/*": ["shared/utils/*"],
+      "@constants/*": ["shared/constants/*"],
+      "@middlewares/*": ["shared/middlewares/*"],
+      "@modes/*": ["shared/modes/*"]
+    }
+  },
+  "include": ["services", "shared"]
+}

@@ -10,4 +10,6 @@ COPY . .
 
 EXPOSE 5001
 
+ENV NODE_ENV=docker
+
 CMD ["npm", "run", "dev"]

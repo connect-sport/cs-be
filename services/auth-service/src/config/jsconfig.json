@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": "",
+    "paths": {
+      "@shared/*": ["../../shared/*"],
+      "@models/*": ["models/*"],
+      "@utils/*": ["utils/*"],
+      "@controllers/*": ["controllers/*"],
+      "@routes/*": ["routes/*"],
+      "@middlewares/*": ["middlewares/*"],
+      "@services/*": ["services/*"],
+      "@config/*": ["config/*"]
+    }
+  }
+}
