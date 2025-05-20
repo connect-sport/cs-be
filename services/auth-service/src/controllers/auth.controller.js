@@ -11,6 +11,7 @@ const {
   internalServerError,
   badRequestError,
   success,
+  unauthorizedError,
 } = require("@shared/utils/response");
 
 exports.register = async (req, res) => {
@@ -50,14 +51,48 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
-  if (!user)
-    return res.status(400).json({ message: "Sai email hoặc mật khẩu" });
+  if (!user) return badRequestError(res, { message: "Không tìm thấy email" });
 
   const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(400).json({ message: "Sai mật khẩu" });
+  if (!valid) return badRequestError(res, { message: "Sai mật khẩu" });
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
-  res.json({ token });
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
+  success(res, { token, user }, "Đăng nhập thành công", StatusCode.OK);
+};
+
+exports.logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  return success(res, {}, "Đăng xuất thành công");
+};
+
+exports.getUser = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return unauthorizedError(res, { message: "Chưa đăng nhập" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user)
+      return notFoundError(res, { message: "Không tìm thấy người dùng" });
+
+    return success(res, { user });
+  } catch (err) {
+    return unauthorizedError(res, { message: "Token không hợp lệ" });
+  }
 };

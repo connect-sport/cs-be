@@ -25,6 +25,19 @@ services:
     networks:
       - backend
 
+  main-service:
+    build: ./services/main-service
+    container_name: main-service
+    ports:
+      - "5004:5002"
+    env_file:
+      - ./services/main-service/.env
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    networks:
+      - backend
+
   gateway:
     build: ./gateway
     container_name: gateway

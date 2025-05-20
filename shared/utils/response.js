@@ -45,7 +45,7 @@ exports.notFoundError = (res, message = "Không tìm thấy", statusCode = 404) 
 
 exports.unauthorizedError = (
   res,
-  { message = "Internal Server Error", statusCode = StatusCode.UNAUTHORIZED }
+  { message = "Unauthorized", statusCode = StatusCode.UNAUTHORIZED }
 ) => {
   return res.status(statusCode).json({
     success: false,
@@ -55,7 +55,7 @@ exports.unauthorizedError = (
 
 exports.fobiddenError = (
   res,
-  { message = "Internal Server Error", statusCode = StatusCode.FORBIDDEN }
+  { message = "Fobidden", statusCode = StatusCode.FORBIDDEN }
 ) => {
   return res.status(statusCode).json({
     success: false,

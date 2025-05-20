@@ -31,10 +31,10 @@ mongoose
   .catch((err) => console.error("❌ Auth MongoDB error:", err));
 
 // Routes
-const authRoutes = require("./routes/auth.route");
-app.use("/api/connect-sport/auth", authRoutes);
+const mainRoutes = require("./routes/main.route");
+app.use("/api/connect-sport/main", mainRoutes);
 
 app.listen(process.env.PORT, () => {
-  console.log(`🔐 Auth service running on port ${process.env.PORT}`);
+  console.log(`🔐 Main service running on port ${process.env.PORT}`);
 });
-// console.log(require("crypto").randomBytes(64).toString("hex"));
+console.log(require("crypto").randomBytes(64).toString("hex"));
