@@ -1,23 +1,14 @@
-const User = require("../models/Menu");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const {
-  EMAIL_VALIDATION_REGEX,
-  PHONE_VALIDATION_REGEX,
-} = require("@shared/constants/regex");
-
-const StatusCode = require("@shared/constants/statusCode");
 const {
   internalServerError,
   badRequestError,
   success,
-  unauthorizedError,
 } = require("@shared/utils/response");
 const Menu = require("../models/Menu");
+const { isEmpty } = require("lodash");
 
 exports.getMenus = async (req, res) => {
   try {
-    const menus = await Menu.find({}).populate("categoryId");
+    const menus = await Menu.find({});
     return success(res, menus, "Lấy danh sách thành công");
   } catch (error) {
     return internalServerError(res, error.message);
@@ -27,7 +18,7 @@ exports.getMenus = async (req, res) => {
 exports.getMenuById = async (req, res) => {
   try {
     const { id } = req.params;
-    const menu = await Menu.findById({ menuId: id }).populate("menuId");
+    const menu = await Menu.findById({ menuId: id });
     if (!menu) {
       return badRequestError(res, { message: "Không tìm thấy danh mục" });
     }
@@ -39,7 +30,7 @@ exports.getMenuById = async (req, res) => {
 
 exports.createMenu = async (req, res) => {
   try {
-    const { name, alias } = req.body;
+    const { name, alias } = req.body.data;
 
     if (!name || !alias) {
       return badRequestError(res, {
@@ -47,9 +38,10 @@ exports.createMenu = async (req, res) => {
       });
     }
 
-    const existingMenu = await Menu.find({ name });
-    if (existingMenu) {
-      return badRequestError(res, { message: "Tên danh mục đã tồn tại" });
+    const existingMenu = await Menu.findOne({ name, alias });
+
+    if (!isEmpty(existingMenu)) {
+      return badRequestError(res, { message: "Menu existed!" });
     }
 
     const menu = new Menu({
@@ -59,7 +51,7 @@ exports.createMenu = async (req, res) => {
 
     await menu.save();
 
-    return success(res, menu, "Tạo danh mục thành công");
+    return success(res, menu, "Create menu success!");
   } catch (error) {
     return internalServerError(res, error.message);
   }

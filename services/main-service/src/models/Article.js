@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
-const menuSchema = new mongoose.Schema(
+const articleSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true, unique: true },
+    title: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     address: { type: String, required: true },
     content: { type: String, required: true },
@@ -19,4 +19,4 @@ const menuSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Menu", menuSchema);
+module.exports = mongoose.model("Article", articleSchema);

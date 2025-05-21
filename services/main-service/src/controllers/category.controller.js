@@ -33,14 +33,14 @@ exports.getCategoryById = async (req, res) => {
 exports.createCategory = async (req, res) => {
   try {
     const { name, alias } = req.body.data;
-    console.log(req.body);
+
     if (!name || !alias) {
       return badRequestError(res, {
         message: "Vui lòng nhập đầy đủ thông tin",
       });
     }
 
-    const existingCategory = await Category.findOne({ name });
+    const existingCategory = await Category.findOne({ name, alias });
     if (existingCategory) {
       return badRequestError(res, { message: "Tên danh mục đã tồn tại" });
     }
@@ -54,7 +54,6 @@ exports.createCategory = async (req, res) => {
 
     return success(res, category, "Tạo danh mục thành công");
   } catch (error) {
-    console.log(error);
     return internalServerError(res, error.message);
   }
 };
@@ -68,11 +67,6 @@ exports.updateCategory = async (req, res) => {
       return badRequestError(res, {
         message: "Vui lòng nhập đầy đủ thông tin",
       });
-    }
-
-    const existingCategory = await Category.findOne({ name });
-    if (existingCategory) {
-      return badRequestError(res, { message: "Tên danh mục đã tồn tại" });
     }
 
     const category = await Category.findByIdAndUpdate(
@@ -94,7 +88,6 @@ exports.updateCategory = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
-
     const category = await Category.findByIdAndDelete(id);
 
     if (!category) {
