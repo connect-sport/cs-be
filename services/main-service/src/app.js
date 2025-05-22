@@ -31,8 +31,12 @@ mongoose
   .catch((err) => console.error("❌ Auth MongoDB error:", err));
 
 // Routes
-const mainRoutes = require("./routes/main.route");
-app.use("/api/connect-sport/main", mainRoutes);
+const articleRoutes = require("./routes/article.route");
+const categoryRoutes = require("./routes/category.route");
+const menuRoutes = require("./routes/menu.route");
+app.use("/api/connect-sport/main", articleRoutes);
+app.use("/api/connect-sport/main", categoryRoutes);
+app.use("/api/connect-sport/main", menuRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`🔐 Main service running on port ${process.env.PORT}`);

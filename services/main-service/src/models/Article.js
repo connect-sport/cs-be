@@ -5,8 +5,8 @@ const articleSchema = new mongoose.Schema(
     title: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     address: { type: String, required: true },
-    content: { type: String, required: true },
-    categoryId: {
+    description: { type: String, required: true },
+    category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,

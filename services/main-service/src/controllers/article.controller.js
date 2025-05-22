@@ -1,47 +1,99 @@
 const { internalServerError, success } = require("@shared/utils/response");
 const Article = require("../models/Article");
+const Category = require("../models/Category");
 
-exports.getArticleByCategoryId = async (req, res) => {
+exports.getArticlesByAlias = async (req, res) => {
   try {
-    const { categoryId } = req.params;
-    const articles = await Article.find({ categoryId }).populate("idCategory");
-    if (!articles) {
-      return badRequestError(res, { message: "Không tìm thấy danh mục" });
+    const { alias } = req.body;
+    const category = await Category.find({ alias });
+    if (!category) {
+      return badRequestError(res, { message: "Article not found" });
     }
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 100);
+    const keyword = req.body.keyword || "";
+    const skip = (page - 1) * limit;
 
-    return success(res, articles, "Lấy danh sách bài viết thành công");
+    const [articles, total] = await Promise.all([
+      Article.find({ title: new RegExp(keyword, "i") })
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .populate("category"),
+      Article.countDocuments({ title: new RegExp(keyword, "i") }),
+    ]);
+
+    return success(
+      res,
+      {
+        data: articles,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+      "Success"
+    );
   } catch (error) {
     return internalServerError(res, error.message);
   }
 };
 
-exports.createArticleByCategoryId = async (req, res) => {
+exports.createArticleByAlias = async (req, res) => {
   try {
-    const { categoryId } = req.params;
-    const { title, content } = req.body;
+    const { title, phoneNumber, address, description, category, level } =
+      req.body.data;
+
+    const existCategory = await Category.findOne({ alias: category });
+    if (!existCategory) {
+      return badRequestError(res, { message: "Không tìm thấy danh mục" });
+    }
+
+    if (!phoneNumber) {
+      return badRequestError(res, { message: "Phone number is require" });
+    }
+
+    if (!address) {
+      return badRequestError(res, { message: "Address is require" });
+    }
+
+    if (!description) {
+      return badRequestError(res, { message: "Description is require" });
+    }
 
     const article = new Article({
       title,
-      content,
-      categoryId,
+      phoneNumber,
+      address,
+      description,
+      category: existCategory,
+      level,
     });
 
     await article.save();
 
     return success(res, article, "Tạo bài viết thành công");
   } catch (error) {
+    console.error("Error fetching articles:", error);
     return internalServerError(res, error.message);
   }
 };
 
-exports.updateArticleByCategoryId = async (req, res) => {
+exports.updateArticleByAlias = async (req, res) => {
   try {
-    const { categoryId } = req.params;
-    const { title, content } = req.body;
+    const { alias } = req.params;
+    const { id, title, phoneNumber, address, description } = req.body;
+
+    const category = await Category.findOne({ alias });
+    if (!category) {
+      return badRequestError(res, { message: "Không tìm thấy danh mục" });
+    }
 
     const article = await Article.findByIdAndUpdate(
-      categoryId,
-      { title, content },
+      { alias, id },
+      { title, phoneNumber, address, description },
       { new: true }
     );
 
@@ -55,17 +107,22 @@ exports.updateArticleByCategoryId = async (req, res) => {
   }
 };
 
-exports.deleteArticleByCategoryId = async (req, res) => {
+exports.deleteArticleByAlias = async (req, res) => {
   try {
-    const { categoryId } = req.params;
+    const { alias, id } = req.params;
 
-    const article = await Article.findByIdAndDelete(categoryId);
-
-    if (!article) {
-      return badRequestError(res, { message: "Không tìm thấy bài viết" });
+    const category = await Category.findOne({ alias });
+    if (!category) {
+      return badRequestError(res, { message: "Not found category" });
     }
 
-    return success(res, article, "Xóa bài viết thành công");
+    const article = await Article.findByIdAndDelete({ alias, id });
+
+    if (!article) {
+      return badRequestError(res, { message: "Not found article" });
+    }
+
+    return success({ success: true }, "Delete article success");
   } catch (error) {
     return internalServerError(res, error.message);
   }
