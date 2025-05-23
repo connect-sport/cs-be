@@ -11,6 +11,7 @@ exports.getCategories = async (req, res) => {
 
     return success(res, categories, "Lấy danh sách thành công");
   } catch (error) {
+    console.log(error);
     return internalServerError(res, error.message);
   }
 };

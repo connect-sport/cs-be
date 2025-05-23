@@ -1,6 +1,7 @@
 const { internalServerError, success } = require("@shared/utils/response");
 const Article = require("../models/Article");
 const Category = require("../models/Category");
+const { isEmpty } = require("lodash");
 
 exports.getArticlesByAlias = async (req, res) => {
   try {
@@ -9,13 +10,41 @@ exports.getArticlesByAlias = async (req, res) => {
     if (!category) {
       return badRequestError(res, { message: "Article not found" });
     }
-    const page = Math.max(parseInt(req.query.page) || 1, 1);
-    const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 100);
-    const keyword = req.body.keyword || "";
+
+    const page = Math.max(parseInt(req.body.pagination?.page) || 1, 1);
+    const limit = Math.min(
+      Math.max(parseInt(req.body.pagination?.limit) || 10, 1),
+      100
+    );
+    const keyword = req.body.filters?.keyword || "";
+    const address = req.body.filters?.address || "";
+    const levels = req.body.filters?.levels || [];
     const skip = (page - 1) * limit;
 
+    const query = {};
+
+    if (category) {
+      query.category = category[0]._id;
+    }
+
+    if (address) {
+      query.address = address;
+    }
+
+    if (!isEmpty(levels)) {
+      query.levels = {
+        $in: [...levels, [], null],
+      };
+    }
+
+    if (keyword.trim()) {
+      query.$or = [{ description: new RegExp(keyword, "i") }];
+    }
+
+    console.log("query", query);
+
     const [articles, total] = await Promise.all([
-      Article.find({ title: new RegExp(keyword, "i") })
+      Article.find(query)
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 })
@@ -37,13 +66,14 @@ exports.getArticlesByAlias = async (req, res) => {
       "Success"
     );
   } catch (error) {
+    console.log(error);
     return internalServerError(res, error.message);
   }
 };
 
 exports.createArticleByAlias = async (req, res) => {
   try {
-    const { title, phoneNumber, address, description, category, level } =
+    const { title, phoneNumber, address, description, category, levels } =
       req.body.data;
 
     const existCategory = await Category.findOne({ alias: category });
@@ -69,14 +99,13 @@ exports.createArticleByAlias = async (req, res) => {
       address,
       description,
       category: existCategory,
-      level,
+      levels,
     });
 
     await article.save();
 
     return success(res, article, "Tạo bài viết thành công");
   } catch (error) {
-    console.error("Error fetching articles:", error);
     return internalServerError(res, error.message);
   }
 };

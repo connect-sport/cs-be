@@ -15,6 +15,9 @@ const articleSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    levels: {
+      type: Array,
+    },
   },
   { timestamps: true }
 );
