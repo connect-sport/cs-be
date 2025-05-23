@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon -r module-alias/register src/app.js"
+    "dev": "cross-env NODE_ENV=development nodemon -r module-alias/register src/app.js",
+    "build": "NODE_ENV=production node -r module-alias/register src/app.js",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up --build"
   },
   "keywords": [],
   "author": "",
