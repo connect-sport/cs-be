@@ -5,7 +5,6 @@ WORKDIR /service/chat-service
 COPY package*.json ./
 RUN npm install
 
-COPY .env ./
 COPY . .
 
 EXPOSE 5002
