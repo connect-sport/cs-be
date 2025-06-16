@@ -1,0 +1,50 @@
+name: Deploy Microservices
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push auth-service
+        uses: docker/build-push-action@v5
+        with:
+          context: ../../services/auth-service
+          push: true
+          tags: yourdockerhub/auth-service:latest
+
+      - name: Build and push main-service
+        uses: docker/build-push-action@v5
+        with:
+          context: ../../services/main-service
+          push: true
+          tags: yourdockerhub/auth-service:latest
+
+      - name: Build and push user-service
+        uses: docker/build-push-action@v5
+        with:
+          context: ../../services/chat-service
+          push: true
+          tags: yourdockerhub/user-service:latest
+
+      - name: Build and push api-gateway
+        uses: docker/build-push-action@v5
+        with:
+          context: ../../gateway
+          push: true
+          tags: yourdockerhub/gateway:latest
