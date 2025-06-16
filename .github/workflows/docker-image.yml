@@ -24,27 +24,27 @@ jobs:
       - name: Build and push auth-service
         uses: docker/build-push-action@v5
         with:
-          context: ../../services/auth-service
+          context: ./services/auth-service
           push: true
           tags: yourdockerhub/auth-service:latest
 
       - name: Build and push main-service
         uses: docker/build-push-action@v5
         with:
-          context: ../../services/main-service
+          context: ./services/main-service
           push: true
           tags: yourdockerhub/auth-service:latest
 
       - name: Build and push user-service
         uses: docker/build-push-action@v5
         with:
-          context: ../../services/chat-service
+          context: ./services/chat-service
           push: true
           tags: yourdockerhub/user-service:latest
 
       - name: Build and push api-gateway
         uses: docker/build-push-action@v5
         with:
-          context: ../../gateway
+          context: ./gateway
           push: true
           tags: yourdockerhub/gateway:latest
