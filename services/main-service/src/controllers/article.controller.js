@@ -2,6 +2,11 @@ const { internalServerError, success } = require("@shared/utils/response");
 const Article = require("../models/Article");
 const Category = require("../models/Category");
 const { isEmpty } = require("lodash");
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const Address = require("../models/Address");
+
+dayjs.extend(utc);
 
 exports.getArticlesByAlias = async (req, res) => {
   try {
@@ -18,6 +23,8 @@ exports.getArticlesByAlias = async (req, res) => {
     );
     const keyword = req.body.filters?.keyword || "";
     const address = req.body.filters?.address || "";
+    const fromDateTime = req.body.filters?.fromDateTime || "";
+    const toDateTime = req.body.filters?.toDateTime || "";
     const levels = req.body.filters?.levels || [];
     const skip = (page - 1) * limit;
 
@@ -41,14 +48,22 @@ exports.getArticlesByAlias = async (req, res) => {
       query.$or = [{ description: new RegExp(keyword, "i") }];
     }
 
-    console.log("query", query);
+    if (fromDateTime && toDateTime) {
+      const from = dayjs(fromDateTime).utc();
+      const to = dayjs(toDateTime).utc();
+      query.createdAt = {
+        $gte: new Date(fromDateTime),
+        $lte: new Date(toDateTime),
+      };
+    }
 
     const [articles, total] = await Promise.all([
       Article.find(query)
         .skip(skip)
         .limit(limit)
-        .sort({ createdAt: -1 })
-        .populate("category"),
+        .populate("category")
+        .populate("address")
+        .sort({ createdAt: -1 }),
       Article.countDocuments({ title: new RegExp(keyword, "i") }),
     ]);
 
@@ -89,6 +104,11 @@ exports.createArticleByAlias = async (req, res) => {
       return badRequestError(res, { message: "Address is require" });
     }
 
+    const existAddress = await Address.findOne({ value: address });
+    if (!existAddress) {
+      return badRequestError(res, { message: "Không tìm thấy địa chỉ" });
+    }
+
     if (!description) {
       return badRequestError(res, { message: "Description is require" });
     }
@@ -96,10 +116,12 @@ exports.createArticleByAlias = async (req, res) => {
     const article = new Article({
       title,
       phoneNumber,
-      address,
+      address: existAddress,
       description,
       category: existCategory,
       levels,
+      fromDateTime: dayjs(req.body.data.fromDateTime).toISOString(),
+      toDateTime: dayjs(req.body.data.toDateTime).toISOString(),
     });
 
     await article.save();

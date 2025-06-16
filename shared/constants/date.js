@@ -1,0 +1,9 @@
+const HOUR_MINUTE_FORMAT = "HH:mm";
+const DATE_FORMAT = "YYYY-MM-DD";
+const DATE_TIME_FORMAT = "DD/MM/YYYY HH:mm:ss";
+
+module.exports = {
+  HOUR_MINUTE_FORMAT,
+  DATE_FORMAT,
+  DATE_TIME_FORMAT,
+};
