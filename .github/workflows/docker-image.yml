@@ -26,25 +26,25 @@ jobs:
         with:
           context: ./services/auth-service
           push: true
-          tags: yourdockerhub/auth-service:latest
+          tags: nxhoang189/connect-sport/auth-service:latest
 
       - name: Build and push main-service
         uses: docker/build-push-action@v5
         with:
           context: ./services/main-service
           push: true
-          tags: yourdockerhub/auth-service:latest
+          tags: nxhoang189/connect-sport/auth-service:latest
 
       - name: Build and push user-service
         uses: docker/build-push-action@v5
         with:
           context: ./services/chat-service
           push: true
-          tags: yourdockerhub/user-service:latest
+          tags: nxhoang189/connect-sport/user-service:latest
 
       - name: Build and push api-gateway
         uses: docker/build-push-action@v5
         with:
           context: ./gateway
           push: true
-          tags: yourdockerhub/gateway:latest
+          tags: nxhoang189/connect-sport/gateway:latest
